@@ -1,0 +1,99 @@
+import java.util.*;
+class HuffmanNode
+{
+    int data;
+    char c;
+    HuffmanNode left;
+    HuffmanNode right;
+    HuffmanNode(int d, char ch)
+    {
+        data = d;
+        c = ch;
+    }
+}
+class Comp implements Comparator<HuffmanNode>
+{
+    public int compare(HuffmanNode a,HuffmanNode b)
+    {
+        return a.data-b.data;
+    }
+}
+public class Huffman
+{
+    static HashMap<Character,String> m = new HashMap();
+    static void codes(HuffmanNode root,String s)
+    {
+        if(root == null)
+            return;
+        if(root.c != '-')
+          m.put(root.c,s);
+        codes(root.left,s+"0");
+        codes(root.right,s+"1");
+
+    }
+    static String decode(String e,HuffmanNode root)
+    {
+        String s = "";
+        HuffmanNode temp = root;
+        for(int i = 0; i < e.length(); i++)
+        {
+            if(e.charAt(i) == '0')
+                temp = temp.left;
+            else
+                 temp = temp.right;
+          if(temp.c !='-')
+            {
+                s = s + temp.c;
+                temp = root;
+                continue;
+            }
+        }
+        return s;
+    }
+
+    public static void main(String[] args0)
+    {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Input Any String");
+        String input = sc.nextLine();
+        HashMap<Character,Integer>map = new HashMap();
+        for(int i = 0; i < input.length(); i++)
+        {
+            if(map.containsKey(input.charAt(i) )== false)
+                map.put(input.charAt(i),1);
+            else
+                map.put(input.charAt(i),map.get(input.charAt(i))+1);
+
+        }
+        ArrayList<HuffmanNode>list = new ArrayList();
+        PriorityQueue<HuffmanNode> q = new PriorityQueue(3,new Comp());
+        Iterator<Map.Entry<Character,Integer>> itr = map.entrySet().iterator();
+        while(itr.hasNext())
+        {
+            Map.Entry<Character,Integer> e = itr.next();
+            q.add(new HuffmanNode(e.getValue(),e.getKey()));
+        }
+        while(q.size() > 1)
+        {
+            HuffmanNode a = q.peek();
+            q.poll();
+            HuffmanNode b = q.peek();
+            q.poll();
+            HuffmanNode d = new HuffmanNode(a.data+b.data,'-');
+            d.left = a;
+            d.right = b;
+            q.add(d);
+
+        }
+       HuffmanNode root = q.peek();
+       codes(root,"");
+       String encode = "";
+       for(int i = 0; i < input.length(); i++)
+       {
+           encode = encode + m.get(input.charAt(i));
+       }
+       System.out.println(encode);
+       String s = decode(encode, root);
+       System.out.println(s);
+    }
+}
